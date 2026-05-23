@@ -1,0 +1,136 @@
+body {
+    margin: 0;
+    font-family: "Microsoft YaHei", sans-serif;
+    background: #f5f7fb;
+    color: #1f2937;
+}
+
+.container {
+    width: min(920px, calc(100% - 32px));
+    margin: 32px auto;
+}
+
+.card {
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    padding: 24px;
+    margin-bottom: 20px;
+}
+
+h1, h2, h3 {
+    margin-top: 0;
+}
+
+.nav {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.nav a, .nav button {
+    background: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.nav a.secondary, .nav button.secondary {
+    background: #475569;
+}
+
+.grid {
+    display: grid;
+    gap: 14px;
+}
+
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+}
+
+label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+}
+
+input, select, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+textarea {
+    min-height: 110px;
+    resize: vertical;
+}
+
+button.primary {
+    background: #0f766e;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+button.warn {
+    background: #b45309;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+    padding: 10px 8px;
+    vertical-align: top;
+}
+
+.hint {
+    color: #475569;
+    font-size: 14px;
+}
+
+.success {
+    color: #15803d;
+}
+
+.danger {
+    color: #b91c1c;
+}
+
+.badge {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: white;
+}
+
+.status-pending {
+    background: #64748b;
+}
+
+.status-processing {
+    background: #2563eb;
+}
+
+.status-done {
+    background: #15803d;
+}

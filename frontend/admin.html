@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>管理员工单管理 - 宿舍报修系统</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="nav">
+        <a href=" ">全部工单</a >
+        <button class="secondary" onclick="logout()">退出登录</button>
+    </div>
+
+    <div class="card">
+        <h1>管理员工单管理</h1>
+        <p class="hint">可以查看全部工单并修改状态。</p >
+    </div>
+
+    <div class="card">
+        <h2>工单列表</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>学生</th>
+                <th>宿舍</th>
+                <th>类别</th>
+                <th>标题</th>
+                <th>描述</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+const API_BASE = "/api";
+const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+if (!user || user.role !== "admin") {
+    alert("请先以管理员身份登录");
+    window.location.href = "/login.html";
+}
+
+function logout() {
+    localStorage.removeItem("currentUser");
+    window.location.href = "/login.html";
+}
+
+function statusOptions(currentStatus) {
+    const values = ["待处理", "处理中", "已完成"];
+    return values.map((value) => {
+        const selected = value === currentStatus ? "selected" : "";
+        return `<option value="${value}" ${selected}>${value}</option>`;
+    }).join("");
+}
+
+async function loadOrders() {
+    const response = await fetch(`${API_BASE}/orders/all?role=admin`);
+    const result = await response.json();
+    const tbody = document.getElementById("tbody");
+    tbody.innerHTML = "";
+
+    if (!result.success) {
+        tbody.innerHTML = `<tr><td colspan="8" class="danger">${result.message}</td></tr>`;
+        return;
+    }
+
+    if (!result.data.length) {
+        tbody.innerHTML = '<tr><td colspan="8" class="hint">暂无工单</td></tr>';
+        return;
+    }
+
+    result.data.forEach((item) => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.student_name}</td>
+                <td>${item.dormitory || ""}</td>
+                <td>${item.category_name}</td>
+                <td>${item.title}</td>
+                <td>${item.description || ""}</td>
+                <td>
+                    <select id="status-${item.id}">
+                        ${statusOptions(item.status)}
+                    </select>
+                </td>
+                <td>
+                    <button class="warn" onclick="updateStatus(${item.id})">保存状态</button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+async function updateStatus(orderId) {
+    const status = document.getElementById(`status-${orderId}`).value;
+    const response = await fetch(`${API_BASE}/orders/${orderId}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            operator_id: user.id,
+            operator_role: user.role,
+            status,
+            remark: `管理员将工单状态修改为：${status}`
+        })
+    });
+    const result = await response.json();
+    alert(result.message);
+    if (result.success) {
+        loadOrders();
+    }
+}
+
+loadOrders();
+</script>
+</body>
+</html>

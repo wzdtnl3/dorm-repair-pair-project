@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>新建报修 - 宿舍报修系统</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="nav">
+    <button class="secondary" onclick="window.location.href='/my-orders.html'">我的报修</button>
+    <button class="primary" onclick="window.location.href='/new-order.html'">新建报修</button>
+    <button class="secondary" onclick="logout()">退出登录</button>
+</div>
+
+    <div class="card">
+        <h1>提交报修工单</h1>
+        <p class="hint">请填写宿舍报修的基本信息。</p >
+    </div>
+
+    <div class="card">
+        <div class="grid">
+            <div>
+                <label for="category">报修类别</label>
+                <select id="category"></select>
+            </div>
+            <div>
+                <label for="title">报修标题</label>
+                <input id="title" placeholder="例如：宿舍灯不亮">
+            </div>
+            <div>
+                <label for="description">问题描述</label>
+                <textarea id="description" placeholder="请简单描述问题和位置"></textarea>
+            </div>
+            <div>
+                <button class="primary" onclick="submitOrder()">提交报修</button>
+            </div>
+            <div id="message" class="hint"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_BASE = "/api";
+const user = JSON.parse(localStorage.getItem("currentUser") || "null");
+
+if (!user || user.role !== "student") {
+    alert("请先以学生身份登录");
+    window.location.href = "/login.html";
+}
+
+function logout() {
+    localStorage.removeItem("currentUser");
+    window.location.href = "/login.html";
+}
+
+async function loadCategories() {
+    const response = await fetch(`${API_BASE}/categories`);
+    const result = await response.json();
+    const category = document.getElementById("category");
+    category.innerHTML = "";
+
+    if (!result.success) {
+        category.innerHTML = '<option value="">加载失败</option>';
+        return;
+    }
+
+    result.data.forEach((item) => {
+        category.innerHTML += `<option value="${item.id}">${item.name}</option>`;
+    });
+}
+
+async function submitOrder() {
+    const categoryId = document.getElementById("category").value;
+    const title = document.getElementById("title").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const message = document.getElementById("message");
+
+    const response = await fetch(`${API_BASE}/orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            student_id: user.id,
+            category_id: Number(categoryId),
+            title,
+            description
+        })
+    });
+    const result = await response.json();
+
+    if (!result.success) {
+        message.className = "danger";
+        message.textContent = result.message;
+        return;
+    }
+
+    message.className = "success";
+    message.textContent = "提交成功，2 秒后跳转到我的报修";
+    setTimeout(() => {
+        window.location.href = "/my-orders.html";
+    }, 2000);
+}
+
+loadCategories();
+</script>
+</body>
+</html>

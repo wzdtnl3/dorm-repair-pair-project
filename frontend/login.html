@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录 - 宿舍报修系统</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>宿舍报修与维修进度管理系统</h1>
+        <p class="hint">最小可运行版本：学生可报修，管理员可查看并修改状态。</p >
+    </div>
+
+    <div class="card">
+        <h2>登录</h2>
+        <div class="grid">
+            <div>
+                <label for="username">用户名</label>
+                <input id="username" placeholder="例如：admin 或 stu001">
+            </div>
+            <div>
+                <label for="password">密码</label>
+                <input id="password" type="password" placeholder="默认 123456">
+            </div>
+            <div>
+                <button class="primary" onclick="login()">登录</button>
+            </div>
+            <div id="message" class="hint"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>默认测试账号</h3>
+        <p class="hint">管理员：admin / 123456</p >
+        <p class="hint">学生：stu001 / 123456</p >
+    </div>
+</div>
+
+<script>
+const API_BASE = "/api";
+
+async function login() {
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const message = document.getElementById("message");
+
+    if (!username || !password) {
+        message.className = "danger";
+        message.textContent = "用户名和密码不能为空";
+        return;
+    }
+
+    const response = await fetch(`${API_BASE}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+    });
+    const result = await response.json();
+
+    if (!result.success) {
+        message.className = "danger";
+        message.textContent = result.message;
+        return;
+    }
+
+    localStorage.setItem("currentUser", JSON.stringify(result.data));
+    message.className = "success";
+    message.textContent = "登录成功，正在跳转...";
+
+    if (result.data.role === "admin") {
+        window.location.href = "/admin.html";
+    } else {
+        window.location.href = "/my-orders.html";
+    }
+}
+</script>
+</body>
+</html>
